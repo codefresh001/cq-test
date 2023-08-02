@@ -1,0 +1,261 @@
+
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  annotations:
+    app.cpaas.io/change-cause: ""
+    cpaas.io/operator: admin
+    cpaas.io/updater: admin
+  labels:
+    app.cpaas.io/uuid: 8065efd2-0a76-4c35-84af-c391aabb6308
+  name: cq
+spec:
+  assemblyPhase: Succeeded
+  componentKinds:
+  - group: apps
+    kind: Deployment
+  - group: ""
+    kind: PersistentVolumeClaim
+  - group: ""
+    kind: Service
+  - group: networking.k8s.io
+    kind: Ingress
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+  descriptor: {}
+  selector:
+    matchLabels:
+      app.cpaas.io/name: cq.gitops-xxhe
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.cpaas.io/last-replicas: "1"
+    cpaas.io/operator: admin
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app.cpaas.io/name: cq.gitops-xxhe
+    app.cpaas.io/uuid: 8065efd2-0a76-4c35-84af-c391aabb6308
+  name: cq-nginx
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      project.cpaas.io/name: gitops
+      service.cpaas.io/name: deployment-cq-nginx
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        cpaas.io/creator: admin
+      creationTimestamp: null
+      labels:
+        app.cpaas.io/name: cq.gitops-xxhe
+        project.cpaas.io/name: gitops
+        service.cpaas.io/name: deployment-cq-nginx
+    spec:
+      affinity: {}
+      containers:
+      - image: nginx:latest
+        imagePullPolicy: Always
+        name: nginx
+        resources:
+          limits:
+            cpu: 1m
+            memory: 1Mi
+          requests:
+            cpu: 1m
+            memory: 1Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    cpaas.io/operator: admin
+  labels:
+    app.cpaas.io/name: cq.gitops-xxhe
+    app.cpaas.io/uuid: 8065efd2-0a76-4c35-84af-c391aabb6308
+  name: cq-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ""
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    ovn.kubernetes.io/vpc: ovn-cluster
+  labels:
+    app.cpaas.io/name: cq.gitops-xxhe
+    app.cpaas.io/uuid: 8065efd2-0a76-4c35-84af-c391aabb6308
+  name: nginx
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: PreferDualStack
+  ports:
+  - appProtocol: tcp
+    name: tcp-11-11
+    port: 11
+    protocol: TCP
+    targetPort: 11
+  selector:
+    app.cpaas.io/name: cq.gitops-xxhe
+    project.cpaas.io/name: gitops
+    service.cpaas.io/name: deployment-cq-nginx
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cpaas.io/display-name: ""
+    cpaas.io/operator: admin
+    ovn.kubernetes.io/vpc: ovn-cluster
+    resource.cpaas.io/reference: '["Deployment.test2"]'
+  labels:
+    app.cpaas.io/name: cq.gitops-xxhe
+  name: test2
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: PreferDualStack
+  ports:
+  - appProtocol: tcp
+    name: tcp-2-2
+    port: 2
+    protocol: TCP
+    targetPort: 2
+  selector:
+    project.cpaas.io/name: gitops
+    service.cpaas.io/name: deployment-test2
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cpaas.io/display-name: ""
+    cpaas.io/operator: admin
+    ovn.kubernetes.io/vpc: ovn-cluster
+    resource.cpaas.io/reference: '["Deployment.cq-nginx"]'
+  labels:
+    app.cpaas.io/name: cq.gitops-xxhe
+  name: cvcvv
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: PreferDualStack
+  ports:
+  - appProtocol: tcp
+    name: tcp-111-111
+    port: 111
+    protocol: TCP
+    targetPort: 111
+  selector:
+    app.cpaas.io/name: cq.gitops-xxhe
+    project.cpaas.io/name: gitops
+    service.cpaas.io/name: deployment-cq-nginx
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cpaas.io/display-name: ""
+    cpaas.io/operator: admin
+    ovn.kubernetes.io/vpc: ovn-cluster
+    resource.cpaas.io/reference: '["Deployment.test1"]'
+  labels:
+    app.cpaas.io/name: cq.gitops-xxhe
+  name: test1
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: PreferDualStack
+  ports:
+  - appProtocol: tcp
+    name: tcp-1-1
+    port: 1
+    protocol: TCP
+    targetPort: 1
+  selector:
+    project.cpaas.io/name: gitops
+    service.cpaas.io/name: deployment-test1
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cpaas.io/display-name: ""
+    cpaas.io/operator: admin
+  labels:
+    app.cpaas.io/name: cq.gitops-xxhe
+  name: pdendmsd
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: test1
+            port:
+              number: 1
+        path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: test2
+            port:
+              number: 2
+        path: /c
+        pathType: Prefix
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  annotations:
+    cpaas.io/display-name: ""
+    cpaas.io/operator: admin
+    listeners.cpaas.io/creationTimestamp: '["2023-07-28T02:25:55.736Z"]'
+    listeners.cpaas.io/display-name: '[""]'
+  labels:
+    app.cpaas.io/name: cq.gitops-xxhe
+  name: cq-gateway
+spec:
+  gatewayClassName: cpaas-system
+  listeners:
+  - allowedRoutes:
+      namespaces:
+        from: All
+    name: gateway-metric
+    port: 11782
+    protocol: TCP
